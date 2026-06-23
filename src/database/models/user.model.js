@@ -17,9 +17,23 @@ const userSchema = new mongoose.Schema(
             match: /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/,
             required: true,
         },
+        isVerified: {
+            type: Boolean,
+            default: false,
+        },
+        otp: {
+            type: String,
+        },
+        authProvider: {
+            type: String,
+            enum: ["local", "google"],
+            default: "local",
+        },
         password: {
             type: String,
-            required: true,
+            required: function () {
+                return this.authProvider === "local";
+            },
         },
         phone: {
             type: String,
@@ -31,14 +45,13 @@ const userSchema = new mongoose.Schema(
             enum: [0, 1],
             default: 0,
         },
-        profileLink: {
+        profileImage: {
             type: String,
-            unique: true,
         },
         status: {
             type: String,
             enum: ["active", "inactive", "deleted"],
-            default: "active",
+            default: "inactive",
         },
     },
     { timestamps: true },
@@ -47,6 +60,7 @@ const userSchema = new mongoose.Schema(
 userSchema.set("toJSON", {
     transform: (doc, ret) => {
         delete ret.password;
+        delete ret.otp;
         delete ret.__v;
         return ret;
     },

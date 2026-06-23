@@ -1,3 +1,5 @@
 .env
 /node_modules
 sessions.md
+Google.json
+/uploads

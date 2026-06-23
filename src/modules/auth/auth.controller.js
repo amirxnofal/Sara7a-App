@@ -1,8 +1,18 @@
 import { Router } from "express";
 import { SuccessResponse } from "../../common/utils/Responses/success.response.js";
-import { getAccessToken, login, register } from "./auth.service.js";
+import {
+    emailLogin,
+    getAccessToken,
+    googelLogin,
+    register,
+    verifyEmail,
+} from "./auth.service.js";
 import { Validation } from "../../common/middleware/validation/validation.middleware.js";
-import { loginSchema, registerSchema } from "./auth.validation.js";
+import {
+    loginSchema,
+    registerSchema,
+    verifyEmailSchema,
+} from "./auth.validation.js";
 
 const router = Router();
 
@@ -21,10 +31,10 @@ router.post("/register", Validation(registerSchema), async (req, res, next) => {
     }
 });
 
-//*------------ Login ------------
+//*------------ Login with email ------------
 router.post("/login", Validation(loginSchema), async (req, res, next) => {
     try {
-        const result = await login(req.body, req.get("host"));
+        const result = await emailLogin(req.body, req.get("host"));
         SuccessResponse({
             res,
             message: "Login success",
@@ -48,6 +58,40 @@ router.get("/token", async (req, res, next) => {
             message: "Access token",
             token: result,
             status: 201,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+//*------------ Verify email ------------
+router.post(
+    "/verify",
+    Validation(verifyEmailSchema),
+    async (req, res, next) => {
+        try {
+            const result = await verifyEmail(req.body);
+            SuccessResponse({
+                res,
+                message: "Email verified",
+                data: result,
+                status: 200,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+);
+
+//*------------ Login with Google ------------
+router.post("/google-login", async (req, res, next) => {
+    try {
+        const result = await googelLogin(req.body, req.get("host"));
+        SuccessResponse({
+            res,
+            message: "Login success",
+            data: { access_token: result.token },
+            status: 200,
         });
     } catch (error) {
         next(error);

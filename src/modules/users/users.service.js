@@ -14,6 +14,7 @@ import {
     UnAuthorizedException,
 } from "../../common/utils/Error/error.handler.js";
 import { GenerateToken } from "../../common/middleware/auth/token.js";
+import { env } from "../../../config/env.service.js";
 
 //*------------ Get my profile ------------
 export const retriveProfile = async (userId) => {
@@ -27,38 +28,40 @@ export const retriveProfile = async (userId) => {
 };
 
 //*------------ Update profile ------------
-export const updateProfile = async (data, userId) => {
-    let { username, email, password, newPassword, profileLink, phone } = data;
+export const updateProfile = async (data, userId, file) => {
+    let { username, email, password, newPassword, phone } = data;
 
-    const userExist = await userModel.findById(userId);
-    if (!userExist || userExist.status === "deleted")
+    const isExist = await userModel.findById(userId);
+    if (!isExist || isExist.status === "deleted")
         NotFoundException({ message: "user not found" });
 
     if (email || newPassword) {
-        let comparedPassword = await CompareText(password, userExist.password);
+        let comparedPassword = await CompareText(password, isExist.password);
         if (!comparedPassword)
             UnAuthorizedException({ message: "Wrong password!" });
 
-        if (newPassword) userExist.password = await HashText(newPassword);
+        if (newPassword) isExist.password = await HashText(newPassword);
 
-        if (email && email !== userExist.email) {
-            const isExist = await userModel.findOne({ email });
-            if (isExist) ConflictException({ message: "email already exist" });
-            userExist.email = email;
+        if (email && email !== isExist.email) {
+            const isEmailExist = await userModel.findOne({ email });
+            if (isEmailExist)
+                ConflictException({ message: "email already exist" });
+            isEmailExist.email = email;
         }
     }
 
-    if (username) userExist.username = username;
+    if (username) isExist.username = username;
 
-    if (phone && phone !== userExist.phone) {
+    if (phone && phone !== isExist.phone) {
         const phoneExist = await userModel.findOne({ phone });
         if (phoneExist) ConflictException({ message: "phone already exist" });
-        userExist.phone = phone;
+        isExist.phone = phone;
     }
-    if (profileLink) userExist.profileLink = profileLink;
-
-    await userExist.save();
-    return userExist;
+    if (file) {
+        isExist.profileImage = `${env.serverUrl}/${file.path}`;
+    }
+    await isExist.save();
+    return isExist;
 };
 
 //*------------ Activate profile ------------

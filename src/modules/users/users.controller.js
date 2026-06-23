@@ -10,6 +10,7 @@ import {
 } from "./users.service.js";
 import { Validation } from "../../common/middleware/validation/validation.middleware.js";
 import { updateStatusSchema, updateUserSchema } from "./users.validation.js";
+import { upload } from "../../common/middleware/multer.middleware.js";
 
 const router = Router();
 
@@ -33,9 +34,15 @@ router.put(
     "/profile",
     Auth,
     Validation(updateUserSchema),
+    upload().single("profileImage"),
     async (req, res, next) => {
+        
         try {
-            const result = await updateProfile(req.body, req.user._id);
+            const result = await updateProfile(
+                req.body,
+                req.user._id,
+                req.file,
+            );
             SuccessResponse({
                 res,
                 message: "Profile updated",

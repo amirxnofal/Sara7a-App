@@ -11,19 +11,7 @@ export const Auth = (req, res, next) => {
     const token = authorization.split(" ")[1];
 
     try {
-        const decoded = jwt.decode(token);
-
-        let signature = "";
-        switch (decoded.aud[0]) {
-            case 0:
-                signature = env.userSignature;
-                break;
-            case 1:
-                signature = env.adminSignature;
-                break;
-        }
-
-        req.user = jwt.verify(token, signature);
+        req.user = jwt.verify(token, env.secretKey);
         next();
     } catch (err) {
         UnAuthorizedException({ message: err.message });

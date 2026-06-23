@@ -27,7 +27,6 @@ export const updateUserSchema = joi.object({
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
         ),
     phone: joi.string().optional(),
-    profileLink: joi.string().optional(),
 });
 
 export const updateStatusSchema = joi.object({
@@ -35,6 +34,7 @@ export const updateStatusSchema = joi.object({
         .string()
         .min(8)
         .optional()
+        .required()
         .pattern(
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
         ),
