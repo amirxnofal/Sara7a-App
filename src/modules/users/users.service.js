@@ -36,7 +36,11 @@ export const updateProfile = async (data, userId, file) => {
         NotFoundException({ message: "user not found" });
 
     if (email || newPassword) {
+        console.log("Email: ", email);
+        console.log("newPassword: ", newPassword);
+        console.log("Password: ", password);
         let comparedPassword = await CompareText(password, isExist.password);
+        console.log("Compare result: ", comparedPassword);
         if (!comparedPassword)
             UnAuthorizedException({ message: "Wrong password!" });
 
@@ -44,9 +48,35 @@ export const updateProfile = async (data, userId, file) => {
 
         if (email && email !== isExist.email) {
             const isEmailExist = await userModel.findOne({ email });
+            console.log(isEmailExist);
             if (isEmailExist)
                 ConflictException({ message: "email already exist" });
-            isEmailExist.email = email;
+            isExist.email = email;
+            isExist.isVerified = false;
+
+            const code = Math.floor(100000 + Math.random() * 900000).toString();
+            const otp = await HashText(code);
+            const isSent = await sendEmail({
+                to: email,
+                subject: "Your OTP Code",
+                html: `
+                    <!DOCTYPE html>
+                    <html>
+                    <body style="font-family: Arial, sans-serif; background-color: #f4f4f4; padding: 20px;">
+                        <div style="max-width: 500px; margin: auto; background: #fff; border-radius: 10px; padding: 30px; text-align: center;">
+                            <h1 style="color: #4F46E5;">Sara7a App 💬</h1>
+                            <p style="color: #555; font-size: 16px;">Your OTP Code is:</p>
+                            <h2 style="letter-spacing: 10px; font-size: 36px; color: #4F46E5;">${code}</h2>
+                            <p style="color: #aaa; font-size: 12px;">This code expires in 10 minutes.</p>
+                            <p style="color: #aaa; font-size: 12px;">If you didn't request this, ignore this email.</p>
+                        </div>
+                    </body>
+                    </html>
+                `,
+            });
+
+            if (!isSent) BadRequestException({ message: "Failed to send OTP" });
+            isExist.otp = code;
         }
     }
 
