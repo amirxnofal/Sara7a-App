@@ -22,4 +22,6 @@ export const env = {
     googleAppPassword: process.env.GOOGLE_APP_PASSWORD,
 
     googleClientId: process.env.GOOGLE_CLIENT_ID,
+
+    redisUrl: process.env.REDIS_URL,
 };

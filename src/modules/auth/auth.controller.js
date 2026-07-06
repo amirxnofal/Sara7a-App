@@ -4,6 +4,7 @@ import {
     emailLogin,
     getAccessToken,
     googelLogin,
+    logout,
     register,
     verifyEmail,
 } from "./auth.service.js";
@@ -13,6 +14,7 @@ import {
     registerSchema,
     verifyEmailSchema,
 } from "./auth.validation.js";
+import { Auth } from "../../common/middleware/auth/auth.middleware.js";
 
 const router = Router();
 
@@ -91,6 +93,21 @@ router.post("/google-login", async (req, res, next) => {
             res,
             message: "Login success",
             data: { access_token: result.token },
+            status: 200,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
+//*------------ Logout ------------
+router.post("/logout", Auth, async (req, res, next) => {
+    try {
+        const result = await logout(req);
+        SuccessResponse({
+            res,
+            message: "Logout success",
+            data: result,
             status: 200,
         });
     } catch (error) {

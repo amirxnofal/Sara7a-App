@@ -21,9 +21,6 @@ const userSchema = new mongoose.Schema(
             type: Boolean,
             default: false,
         },
-        otp: {
-            type: String,
-        },
         authProvider: {
             type: String,
             enum: ["local", "google"],
