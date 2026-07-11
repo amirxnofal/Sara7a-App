@@ -15,7 +15,6 @@ export const registerSchema = joi.object({
         .pattern(
             /^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$/,
         ),
-    phone: joi.string().optional(),
 });
 
 export const loginSchema = joi.object({

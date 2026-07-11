@@ -11,9 +11,8 @@ const messageSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        isRead: {
-            type: Boolean,
-            default: false,
+        image: {
+            type: String,
         },
     },
     { timestamps: true },

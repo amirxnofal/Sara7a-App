@@ -29,7 +29,7 @@ export const retriveProfile = async (userId) => {
 
 //*------------ Update profile ------------
 export const updateProfile = async (data, userId, file) => {
-    let { username, email, password, newPassword, phone } = data;
+    let { username, email, password, newPassword } = data;
 
     const isExist = await userModel.findById(userId);
     if (!isExist || isExist.status === "deleted")
@@ -54,8 +54,8 @@ export const updateProfile = async (data, userId, file) => {
             isExist.email = email;
             isExist.isVerified = false;
 
-            const code = Math.floor(100000 + Math.random() * 900000).toString();
-            const otp = await HashText(code);
+            const otp = Math.floor(100000 + Math.random() * 900000).toString();
+            const hashedOtp = await HashText(otp);
             const isSent = await sendEmail({
                 to: email,
                 subject: "Your OTP Code",
@@ -66,7 +66,7 @@ export const updateProfile = async (data, userId, file) => {
                         <div style="max-width: 500px; margin: auto; background: #fff; border-radius: 10px; padding: 30px; text-align: center;">
                             <h1 style="color: #4F46E5;">Sara7a App 💬</h1>
                             <p style="color: #555; font-size: 16px;">Your OTP Code is:</p>
-                            <h2 style="letter-spacing: 10px; font-size: 36px; color: #4F46E5;">${code}</h2>
+                            <h2 style="letter-spacing: 10px; font-size: 36px; color: #4F46E5;">${otp}</h2>
                             <p style="color: #aaa; font-size: 12px;">This code expires in 10 minutes.</p>
                             <p style="color: #aaa; font-size: 12px;">If you didn't request this, ignore this email.</p>
                         </div>
@@ -76,17 +76,16 @@ export const updateProfile = async (data, userId, file) => {
             });
 
             if (!isSent) BadRequestException({ message: "Failed to send OTP" });
-            isExist.otp = code;
+            await redis.set({
+                key: `otp:${user._id}`,
+                value: hashedOtp,
+                ttl: 5 * 60, //! Expire in 5 minutes
+            });
         }
     }
 
     if (username) isExist.username = username;
 
-    if (phone && phone !== isExist.phone) {
-        const phoneExist = await userModel.findOne({ phone });
-        if (phoneExist) ConflictException({ message: "phone already exist" });
-        isExist.phone = phone;
-    }
     if (file) {
         isExist.profileImage = `${env.serverUrl}/${file.path}`;
     }

@@ -32,10 +32,6 @@ const userSchema = new mongoose.Schema(
                 return this.authProvider === "local";
             },
         },
-        phone: {
-            type: String,
-            unique: true,
-        },
         role: {
             // ["user: 0","admin :1"],
             type: Number,

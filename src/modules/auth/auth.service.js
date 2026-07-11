@@ -25,13 +25,10 @@ import * as redis from "../../database/redis/redis.serviec.js";
 
 //*------------ Register ------------
 export const register = async (data) => {
-    let { username, email, password, phone } = data;
+    let { username, email, password } = data;
 
     const userExist = await userModel.findOne({ email });
     if (userExist) ConflictException({ message: "email already exist" });
-
-    const phoneExist = await userModel.findOne({ phone });
-    if (phoneExist) ConflictException({ message: "phone already exist" });
 
     const hashedPassword = await HashText(password);
 
@@ -63,7 +60,6 @@ export const register = async (data) => {
         username,
         email,
         password: hashedPassword,
-        phone,
     });
 
     await redis.set({
