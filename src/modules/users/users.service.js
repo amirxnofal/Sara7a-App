@@ -15,6 +15,7 @@ import {
 } from "../../common/utils/Error/error.handler.js";
 import { GenerateToken } from "../../common/middleware/auth/token.js";
 import { env } from "../../../config/env.service.js";
+import { sendEmail } from "../../common/utils/sendEmail.utils.js";
 
 //*------------ Get my profile ------------
 export const retriveProfile = async (userId) => {
