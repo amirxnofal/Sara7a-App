@@ -25,12 +25,17 @@ export const sendMessage = async (receiverId, content, file) => {
     if (receiver.status === "inactive")
         ForbiddenException({ message: "This user is not accepting messages" });
 
-    const message = await messageModel.create({
+    const message = await messageModel.insertOne({
         content,
         receiverId,
         image: file ? `${env.serverUrl}/${file.path}` : undefined,
     });
-
+    
+    if (!message)
+        BadRequestException({
+            message: "Somthing went wrong",
+        });
+    
     return message;
 };
 
