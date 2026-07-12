@@ -16,8 +16,8 @@ const router = Router();
 //*------------ Send an anonymous message to a user ------------
 router.post(
     "/:receiverId",
-    upload().single("image"),
     Validation(sendMessageSchema),
+    upload().single("image"),
     async (req, res, next) => {
         try {
             const result = await sendMessage(
