@@ -21,7 +21,7 @@ export const bootstrap = async () => {
         res.json({ message: "Server is healthy..." });
     });
 
-    app.use(cors());
+    app.use(cors({ origin: "*" }));
     app.use("/auth", authRouter);
     app.use("/users", userRouter);
     app.use("/messages", messageRouter);
