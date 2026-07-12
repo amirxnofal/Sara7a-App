@@ -28,6 +28,18 @@ export const retriveProfile = async (userId) => {
     return isExist;
 };
 
+//*------------ Get User Data By UniqueName ------------
+export const retriveUserDataByUsername = async (username) => {
+    const isExist = await userModel.findOne(username);
+    if (!isExist || isExist.status === "deleted")
+        NotFoundException({ message: "user not found" });
+    
+    if (isExist.status === "inactive")
+        ForbiddenException({ message: "Account is inactive" });
+
+    return isExist;
+};
+
 //*------------ Update profile ------------
 export const updateProfile = async (data, userId, file) => {
     let { username, email, password, newPassword } = data;

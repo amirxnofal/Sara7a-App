@@ -6,6 +6,7 @@ import {
     deleteProfile,
     inactiveProfile,
     retriveProfile,
+    retriveUserDataByUsername,
     updateProfile,
 } from "./users.service.js";
 import { Validation } from "../../common/middleware/validation/validation.middleware.js";
@@ -29,6 +30,21 @@ router.get("/profile", Auth, async (req, res, next) => {
     }
 });
 
+//*------------ Get User Data By Username ------------
+router.get("/get-data-by-username/:username", Auth, async (req, res, next) => {
+    try {
+        const result = await retriveUserDataByUsername(req.params.username);
+        SuccessResponse({
+            res,
+            message: "My profile",
+            data: result,
+            status: 200,
+        });
+    } catch (error) {
+        next(error);
+    }
+});
+
 //*------------ Update Profile ------------
 router.put(
     "/profile",
@@ -36,7 +52,6 @@ router.put(
     Validation(updateUserSchema),
     upload().single("profileImage"),
     async (req, res, next) => {
-        
         try {
             const result = await updateProfile(
                 req.body,
