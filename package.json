@@ -4,7 +4,7 @@
     "description": "",
     "main": "src/main.js",
     "scripts": {
-        "start:dev": "node --watch ./src/main.js"
+        "dev": "node --watch ./src/main.js"
     },
     "keywords": [],
     "author": "",

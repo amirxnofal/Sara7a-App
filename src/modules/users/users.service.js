@@ -37,11 +37,7 @@ export const updateProfile = async (data, userId, file) => {
         NotFoundException({ message: "user not found" });
 
     if (email || newPassword) {
-        console.log("Email: ", email);
-        console.log("newPassword: ", newPassword);
-        console.log("Password: ", password);
         let comparedPassword = await CompareText(password, isExist.password);
-        console.log("Compare result: ", comparedPassword);
         if (!comparedPassword)
             UnAuthorizedException({ message: "Wrong password!" });
 
@@ -49,7 +45,6 @@ export const updateProfile = async (data, userId, file) => {
 
         if (email && email !== isExist.email) {
             const isEmailExist = await userModel.findOne({ email });
-            console.log(isEmailExist);
             if (isEmailExist)
                 ConflictException({ message: "email already exist" });
             isExist.email = email;
