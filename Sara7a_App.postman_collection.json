@@ -1,0 +1,341 @@
+{
+  "info": {
+    "name": "Sara7a App",
+    "description": "مجموعة طلبات جاهزة لاختبار Auth / Users / Messages في مشروع Sara7a App",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:3000" },
+    { "key": "email", "value": "استخدم-ايميلك-الحقيقي@gmail.com" },
+    { "key": "password", "value": "Test@1234" },
+    { "key": "otp", "value": "" },
+    { "key": "accessToken", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "receiverId", "value": "" },
+    { "key": "messageId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Health",
+      "item": [
+        {
+          "name": "Check Health",
+          "request": {
+            "method": "GET",
+            "url": "{{baseUrl}}/check-health"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/register",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"AhmedSara7a\",\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/verify",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"otp\": \"{{otp}}\"\n}"
+            },
+            "description": "بدّل قيمة المتغير otp من تبويب Variables في الكولكشن بالكود اللي وصلك في الإيميل قبل ما تضغط Send"
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.token && json.token.accessToken) {",
+                  "        pm.collectionVariables.set('accessToken', json.token.accessToken);",
+                  "        pm.collectionVariables.set('refreshToken', json.token.refreshToken);",
+                  "        console.log('تم حفظ accessToken و refreshToken تلقائيًا');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/auth/login",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{email}}\",\n  \"password\": \"{{password}}\"\n}"
+            },
+            "description": "بعد الضغط على Send، هتلاقي accessToken و refreshToken اتسجلوا لوحدهم في متغيرات الكولكشن (مفيش حاجة تعملها يدوي)"
+          }
+        },
+        {
+          "name": "Refresh Access Token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.token) {",
+                  "        pm.collectionVariables.set('accessToken', json.token);",
+                  "        console.log('تم تحديث accessToken');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "{{refreshToken}}" }],
+            "url": "{{baseUrl}}/auth/token"
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/auth/logout"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && json.data._id) {",
+                  "        pm.collectionVariables.set('receiverId', json.data._id);",
+                  "        console.log('تم حفظ الـ _id بتاعك في receiverId عشان تستخدمه في اختبار الرسايل');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/users/profile"
+          }
+        },
+        {
+          "name": "Update Profile (username only)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/users/profile",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "username", "value": "AhmedNewName", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Profile (with image)",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/users/profile",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "username", "value": "AhmedNewName", "type": "text" },
+                { "key": "profileImage", "type": "file", "src": "" }
+              ]
+            },
+            "description": "اضغط على قيمة profileImage واختار ملف صورة من جهازك قبل ما تبعت"
+          }
+        },
+        {
+          "name": "Change Password",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/users/profile",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "password", "value": "{{password}}", "type": "text" },
+                { "key": "newPassword", "value": "NewTest@5678", "type": "text" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Inactive Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/profile/inactive",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Active Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/profile/active",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"{{password}}\"\n}"
+            }
+          }
+        },
+        {
+          "name": "Delete Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Authorization", "value": "Bearer {{accessToken}}" },
+              { "key": "Content-Type", "value": "application/json" }
+            ],
+            "url": "{{baseUrl}}/users/profile/delete",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"password\": \"{{password}}\"\n}"
+            },
+            "description": "شغّل الطلب ده في الآخر بعد ما تخلص كل اختباراتك — هيمنعك من تسجيل الدخول تاني بنفس الحساب"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Messages",
+      "item": [
+        {
+          "name": "Send Message (text only)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/messages/{{receiverId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"رسالة سرية تجريبية 👀\"\n}"
+            },
+            "description": "من غير Authorization خالص — الإرسال مجهول الهوية"
+          }
+        },
+        {
+          "name": "Send Message (with image)",
+          "request": {
+            "method": "POST",
+            "url": "{{baseUrl}}/messages/{{receiverId}}",
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                { "key": "content", "value": "رسالة فيها صورة", "type": "text" },
+                { "key": "image", "type": "file", "src": "" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Send Message (empty - should fail)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/messages/{{receiverId}}",
+            "body": {
+              "mode": "raw",
+              "raw": "{}"
+            },
+            "description": "المتوقع: 400 - Message must have text content or an image"
+          }
+        },
+        {
+          "name": "Send Message (invalid receiverId - should fail)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": "{{baseUrl}}/messages/12345",
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"content\": \"test\"\n}"
+            },
+            "description": "المتوقع: 400 - Invalid user id"
+          }
+        },
+        {
+          "name": "Get My Inbox",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const json = pm.response.json();",
+                  "    if (json.data && json.data.messages && json.data.messages.length > 0) {",
+                  "        pm.collectionVariables.set('messageId', json.data.messages[0]._id);",
+                  "        console.log('تم حفظ أول messageId من الـ inbox');",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/messages?page=1&limit=10"
+          }
+        },
+        {
+          "name": "Get Single Message",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/messages/{{messageId}}"
+          }
+        },
+        {
+          "name": "Delete Message",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{accessToken}}" }],
+            "url": "{{baseUrl}}/messages/{{messageId}}"
+          }
+        }
+      ]
+    }
+  ]
+}
