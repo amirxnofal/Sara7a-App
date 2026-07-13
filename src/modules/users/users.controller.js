@@ -11,7 +11,7 @@ import {
 } from "./users.service.js";
 import { Validation } from "../../common/middleware/validation/validation.middleware.js";
 import { updateStatusSchema, updateUserSchema } from "./users.validation.js";
-import { upload } from "../../common/middleware/multer.middleware.js";
+import { upload } from "../../common/middleware/uploads/multer.middleware.js";
 
 const router = Router();
 

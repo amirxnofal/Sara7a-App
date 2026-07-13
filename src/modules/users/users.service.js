@@ -15,7 +15,7 @@ import {
 } from "../../common/utils/Error/error.handler.js";
 import { GenerateToken } from "../../common/middleware/auth/token.js";
 import { env } from "../../../config/env.service.js";
-import { sendEmail } from "../../common/utils/sendEmail.utils.js";
+import { sendEmail } from "../../common/utils/email/sendEmail.utils.js";
 
 //*------------ Get my profile ------------
 export const retriveProfile = async (userId) => {
@@ -33,7 +33,7 @@ export const retriveUserDataByUsername = async (username) => {
     const isExist = await userModel.findOne(username);
     if (!isExist || isExist.status === "deleted")
         NotFoundException({ message: "user not found" });
-    
+
     if (isExist.status === "inactive")
         ForbiddenException({ message: "Account is inactive" });
 

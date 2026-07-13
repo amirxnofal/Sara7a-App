@@ -2,7 +2,7 @@ import { Router } from "express";
 import { SuccessResponse } from "../../common/utils/Responses/success.response.js";
 import { Auth } from "../../common/middleware/auth/auth.middleware.js";
 import { Validation } from "../../common/middleware/validation/validation.middleware.js";
-import { upload } from "../../common/middleware/multer.middleware.js";
+import { upload } from "../../common/middleware/uploads/multer.middleware.js";
 import { sendMessageSchema } from "./messages.validation.js";
 import {
     deleteMessage,

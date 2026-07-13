@@ -18,7 +18,7 @@ import {
     UnAuthorizedException,
 } from "../../common/utils/Error/error.handler.js";
 import { registerSchema } from "./auth.validation.js";
-import { sendEmail } from "../../common/utils/sendEmail.utils.js";
+import { sendEmail } from "../../common/utils/email/sendEmail.utils.js";
 import { OAuth2Client } from "google-auth-library";
 import { env } from "../../../config/env.service.js";
 import * as redis from "../../database/redis/redis.serviec.js";
