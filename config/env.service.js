@@ -24,4 +24,9 @@ export const env = {
     googleClientId: process.env.GOOGLE_CLIENT_ID,
 
     redisUrl: process.env.REDIS_URL,
+    
+    //? Cloudinary
+    cloudinaryCloudName: process.env.CLOUDINARY_CLOUD_NAME,
+    cloudinaryApiKey: process.env.CLOUDINARY_API_KEY,
+    cloudinaryApiSecret: process.env.CLOUDINARY_API_SECRET,
 };
