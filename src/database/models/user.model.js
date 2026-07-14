@@ -1,4 +1,8 @@
 import mongoose from "mongoose";
+import {
+    defaultPublicId,
+    defaultSecureUrl,
+} from "../../common/utils/Constants/cloudinary.constant.js";
 
 const userSchema = new mongoose.Schema(
     {
@@ -39,7 +43,14 @@ const userSchema = new mongoose.Schema(
             default: 0,
         },
         profileImage: {
-            type: String,
+            secure_url: {
+                type: String,
+                default: defaultSecureUrl,
+            },
+            public_id: {
+                type: String,
+                default: defaultPublicId,
+            },
         },
         status: {
             type: String,

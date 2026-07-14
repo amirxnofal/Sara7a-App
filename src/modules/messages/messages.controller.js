@@ -17,13 +17,13 @@ const router = Router();
 router.post(
     "/:receiverId",
     Validation(sendMessageSchema),
-    upload().single("image"),
+    upload.array("attachment",3),
     async (req, res, next) => {
         try {
             const result = await sendMessage(
                 req.params.receiverId,
                 req.body.content,
-                req.file,
+                req.files,
             );
             SuccessResponse({
                 res,
@@ -70,10 +70,7 @@ router.get("/:messageId", Auth, async (req, res, next) => {
 //*------------ Delete a message ------------
 router.delete("/:messageId", Auth, async (req, res, next) => {
     try {
-        const result = await deleteMessage(
-            req.user._id,
-            req.params.messageId,
-        );
+        const result = await deleteMessage(req.user._id, req.params.messageId);
         SuccessResponse({
             res,
             message: "Message deleted",

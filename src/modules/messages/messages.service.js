@@ -7,13 +7,14 @@ import {
     NotFoundException,
 } from "../../common/utils/Error/error.handler.js";
 import { env } from "../../../config/env.service.js";
+import { uploadToCloudinary } from "../../common/utils/uploads/cloudinary.utils.js";
 
 //*------------ Send anonymous message ------------
-export const sendMessage = async (receiverId, content, file) => {
+export const sendMessage = async (receiverId, content, files) => {
     if (!isValidObjectId(receiverId))
         BadRequestException({ message: "Invalid user id" });
 
-    if (!content && !file)
+    if (!content && (!files || files.length === 0))
         BadRequestException({
             message: "Message must have text content or an image",
         });
@@ -25,17 +26,26 @@ export const sendMessage = async (receiverId, content, file) => {
     if (receiver.status === "inactive")
         ForbiddenException({ message: "This user is not accepting messages" });
 
-    const message = await messageModel.insertOne({
+    const message = await messageModel.create({
         content,
         receiverId,
-        image: file ? `${env.serverUrl}/${file.path}` : undefined,
+        images: [],
     });
-    
-    if (!message)
-        BadRequestException({
-            message: "Somthing went wrong",
-        });
-    
+
+    if (files && files.length > 0) {
+        for (const file of files) {
+            const uploadResult = await uploadToCloudinary(
+                file.path,
+                `users/${receiver._id}/attachment`,
+            );
+            message.images.push({
+                secure_url: uploadResult.secure_url,
+                public_id: uploadResult.public_id,
+            });
+        }
+        await message.save();
+    }
+
     return message;
 };
 

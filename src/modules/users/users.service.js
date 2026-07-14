@@ -16,6 +16,10 @@ import {
 import { GenerateToken } from "../../common/middleware/auth/token.js";
 import { env } from "../../../config/env.service.js";
 import { sendEmail } from "../../common/utils/email/sendEmail.utils.js";
+import cloudinary from "../../../config/cloudinary.config.js";
+import fs from "fs";
+import { uploadToCloudinary } from "../../common/utils/uploads/cloudinary.utils.js";
+import { defaultPublicId } from "../../common/utils/Constants/cloudinary.constant.js";
 
 //*------------ Get my profile ------------
 export const retriveProfile = async (userId) => {
@@ -95,7 +99,24 @@ export const updateProfile = async (data, userId, file) => {
     if (username) isExist.username = username;
 
     if (file) {
-        isExist.profileImage = `${env.serverUrl}/${file.path}`;
+        const uploadResult = await uploadToCloudinary(
+            file.path,
+            `users/${userId}/profile_images`,
+        );
+
+        const oldImage = {
+            secure_url: isExist.profileImage.secure_url,
+            public_id: isExist.profileImage.public_id,
+        };
+
+        isExist.profileImage = {
+            secure_url: uploadResult.secure_url,
+            public_id: uploadResult.public_id,
+        };
+
+        if (oldImage.public_id != defaultPublicId) {
+            await cloudinary.uploader.destroy(oldImage.public_id);
+        }
     }
     await isExist.save();
     return isExist;

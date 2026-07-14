@@ -11,9 +11,18 @@ const messageSchema = new mongoose.Schema(
             ref: "User",
             required: true,
         },
-        image: {
-            type: String,
-        },
+        images: [
+            {
+                secure_url: {
+                    type: String,
+                    default: null,
+                },
+                public_id: {
+                    type: String,
+                    default: null,
+                },
+            },
+        ],
     },
     { timestamps: true },
 );

@@ -50,7 +50,7 @@ router.put(
     "/profile",
     Auth,
     Validation(updateUserSchema),
-    upload().single("profileImage"),
+    upload.single("profileImage"),
     async (req, res, next) => {
         try {
             const result = await updateProfile(
