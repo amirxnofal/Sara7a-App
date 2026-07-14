@@ -15,6 +15,7 @@ import {
     verifyEmailSchema,
 } from "./auth.validation.js";
 import { Auth } from "../../common/middleware/auth/auth.middleware.js";
+import { limiter } from "../../common/middleware/rateLimiter/rateLimiter.middleware.js";
 
 const router = Router();
 
@@ -34,19 +35,24 @@ router.post("/register", Validation(registerSchema), async (req, res, next) => {
 });
 
 //*------------ Login with email ------------
-router.post("/login", Validation(loginSchema), async (req, res, next) => {
-    try {
-        const result = await emailLogin(req.body, req.get("host"));
-        SuccessResponse({
-            res,
-            message: "Login success",
-            token: result.token,
-            status: 200,
-        });
-    } catch (error) {
-        next(error);
-    }
-});
+router.post(
+    "/login",
+    limiter,
+    Validation(loginSchema),
+    async (req, res, next) => {
+        try {
+            const result = await emailLogin(req.body, req.get("host"));
+            SuccessResponse({
+                res,
+                message: "Login success",
+                token: result.token,
+                status: 200,
+            });
+        } catch (error) {
+            next(error);
+        }
+    },
+);
 
 //*------------ Get Access Token ------------
 router.get("/token", async (req, res, next) => {
