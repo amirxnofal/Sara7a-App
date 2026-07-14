@@ -33,16 +33,25 @@ export const sendMessage = async (receiverId, content, files) => {
     });
 
     if (files && files.length > 0) {
-        for (const file of files) {
-            const uploadResult = await uploadToCloudinary(
-                file.path,
-                `users/${receiver._id}/attachment`,
-            );
-            message.images.push({
-                secure_url: uploadResult.secure_url,
-                public_id: uploadResult.public_id,
-            });
+        const uploadedImages = [];
+        try {
+            for (const file of files) {
+                const uploadResult = await uploadToCloudinary(
+                    file.path,
+                    `users/${receiver._id}/attachment`,
+                );
+                uploadedImages.push({
+                    secure_url: uploadResult.secure_url,
+                    public_id: uploadResult.public_id,
+                });
+            }
+        } catch (error) {
+            for (const img of uploadedImages) {
+                await cloudinary.uploader.destroy(img.public_id);
+                BadRequestException({ message: "Failed to upload images" });
+            }
         }
+        message.images = uploadedImages;
         await message.save();
     }
 
