@@ -88,19 +88,19 @@ npm install
 أنشئ ملف `.env` داخل مجلد `config/` بالمتغيرات التالية:
 
 ```env
-PORT=3000
+PORT=0000
 MOOD=development
 
 # Database
 MONGOOSE_URL=mongodb://localhost:27017/sara7a_app
 
 # Security
-SALT_ROUNDS=10
+SALT_ROUNDS=0
 SECRET_KEY=your_jwt_secret_key
 REFRESH_SECRET_KEY=your_jwt_refresh_secret_key
 
 # Server
-SERVER_URI=http://localhost:3000
+SERVER_URI=http://localhost:0000
 
 # Email (Nodemailer via Gmail)
 GOOGLE_APP_EMAIL=your_email@gmail.com
@@ -110,7 +110,7 @@ GOOGLE_APP_PASSWORD=your_app_password
 GOOGLE_CLIENT_ID=your_google_client_id
 
 # Redis
-REDIS_URL=redis://localhost:6379
+REDIS_URL=redis://localhost:0000
 ```
 
 4. **تشغيل المشروع (وضع التطوير)**
